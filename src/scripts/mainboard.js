@@ -43,7 +43,7 @@ class MainBoard extends React.Component {
         for (var i = 0; i < tmp.length; i++) {
             neighboors = 0;
 
-            if(i < len) {
+            if (i < len) {
                 // Top edge
                 neighboors += this.state.rCells[total + i - len].alive;
                 if (i === 0) {
@@ -122,13 +122,13 @@ class MainBoard extends React.Component {
             //      Any live cell with two or three live neighbours lives on to the next generation.
             //      Any live cell with more than three live neighbours dies, as if by overpopulation.
             //      Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-            
+
             // Currently a live cell, could modify the tmp = this.state.rCell of some reason, seems like
             // there are still bindings thus when we modify tmp rCell seems to store those modifications too. Just a theory
             if (this.state.rCells[i].alive === 1) {
-                if(neighboors < 2 || 3 < neighboors) newArray[i] = 0;
-                if(neighboors === 2 || neighboors === 3) newArray[i] = 1;
-                if(neighboors > 3) newArray[i] = 0; 
+                if (neighboors < 2 || 3 < neighboors) newArray[i] = 0;
+                if (neighboors === 2 || neighboors === 3) newArray[i] = 1;
+                if (neighboors > 3) newArray[i] = 0;
             } else {
                 if (neighboors === 3) {
                     newArray[i] = 1;
@@ -137,14 +137,14 @@ class MainBoard extends React.Component {
         }
 
         // Copy the status over
-        for(var a = 0; a < tmp.length; a++){
-            if(newArray[a] === 1){
-                if(tmp[a].alive) tmp[a].old = 1;
+        for (var a = 0; a < tmp.length; a++) {
+            if (newArray[a] === 1) {
+                if (tmp[a].alive) tmp[a].old = 1;
                 else tmp[a].alive = 1;
-            } 
-            else tmp[a] = {alive: 0, old: 0};
+            }
+            else tmp[a] = { alive: 0, old: 0 };
         }
-        var gTmp = this.state.generation+1;
+        var gTmp = this.state.generation + 1;
         this.setState({ rCells: tmp, generation: gTmp });
     }
 
@@ -169,7 +169,7 @@ class MainBoard extends React.Component {
     // Buttons start, stop and clear
     start = (event) => {
         var st = setInterval(this.executeGameOfLife, this.state.speed);
-        this.setState({execution: st});
+        this.setState({ execution: st });
         // this.executeGameOfLife();
     }
 
@@ -181,12 +181,18 @@ class MainBoard extends React.Component {
         var size = this.props.x * this.props.y;
         var tmp = this.state.rCells;
         while (size--) tmp[size] = { alive: 0, old: 0 };
-        this.setState({ rCells: this.state.rEmpty , generation: 0});
+        this.setState({ rCells: this.state.rEmpty, generation: 0 });
     }
+
+    componentDidMount = () => {
+        this.populateBoard();
+        this.start();
+    }
+
     render() {
         return (
             <div id="main">
-                <div className="gen">Gene{"   "+this.state.generation+"   "}ration</div>
+                <div className="gen">Gene{"   " + this.state.generation + "   "}ration</div>
                 <div className="buttons">
                     <button onClick={this.start}>Start</button>
                     <button onClick={this.stop}>Stop</button>
