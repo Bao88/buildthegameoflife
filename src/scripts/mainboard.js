@@ -74,13 +74,13 @@ class MainBoard extends React.Component {
             }
 
             // Find the left edge
-            if(i % this.state.x == 0){
+            if(i % this.state.x === 0){
                 // currentCell.dead = false;
                 // tmp[i] = currentCell;
             }
 
             // Find right edge
-            if(i % this.state.x == this.state.x-1){
+            if(i % this.state.x === this.state.x-1){
                 // currentCell.dead = false;
                 // tmp[i] = currentCell;
             }
@@ -109,15 +109,107 @@ class MainBoard extends React.Component {
         // console.log(event.target.id.substring(1));
         var tmp = this.state.rCells;
         var cPosition = parseInt(event.target.id.substring(1));
+        var total = this.state.x*this.state.y, xLength = this.state.x, yLength = this.state.x;
         tmp[cPosition] = {dead: !tmp[cPosition].dead, old: false};
-        tmp[cPosition-this.state.x-1] = {dead: !tmp[cPosition-this.state.x-1].dead, old: false};
-        tmp[cPosition-this.state.x] = {dead: !tmp[cPosition-this.state.x].dead, old: false};
-        tmp[cPosition-this.state.x+1] = {dead: !tmp[cPosition-this.state.x+1].dead, old: false};
-        tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
-        tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
-        tmp[cPosition+this.state.x-1] = {dead: !tmp[cPosition+this.state.x-1].dead, old: false};
-        tmp[cPosition+this.state.x] = {dead: !tmp[cPosition+this.state.x].dead, old: false};
-        tmp[cPosition+this.state.x+1] = {dead: !tmp[cPosition+this.state.x+1].dead, old: false};
+
+        // if(cPosition === 0 || cPosition === xLength-1 || cPosition === total-xLength || cPosition === total-1){
+        //     // Corners
+        //     if(cPosition === 0){
+        //         console.log("top left");
+
+        //     } else if(cPosition === xLength-1){
+        //         console.log("top right");
+        //     } else if(cPosition === total-xLength){
+        //         console.log("bottom left");
+        //     } else if(cPosition === total-1){
+        //         console.log("bottom right");
+        //     }
+        // } else 
+        if(cPosition < this.state.x){
+                // Top edge
+                tmp[total + cPosition-xLength] = {dead: !tmp[total + cPosition-xLength].dead, old: false};
+                if(cPosition === 0){
+                    tmp[total-1] = {dead: !tmp[total-1].dead, old: false};
+                    tmp[cPosition+(xLength*2)-1] = {dead: !tmp[cPosition+(xLength*2)-1].dead, old: false};
+                    tmp[total + cPosition-xLength+1] = {dead: !tmp[total + cPosition-xLength+1].dead, old: false};
+                    tmp[cPosition+xLength+1] = {dead: !tmp[cPosition+xLength+1].dead, old: false};
+                } else if(cPosition === xLength-1){
+                    tmp[0] = {dead: !tmp[0].dead, old: false};
+                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
+                    tmp[total - 2] = {dead: !tmp[total - 2].dead, old: false};
+                    tmp[total - xLength] = {dead: !tmp[total - xLength].dead, old: false};
+                } else {
+                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
+                    tmp[total + cPosition-xLength-1] = {dead: !tmp[total + cPosition-xLength-1].dead, old: false};
+                    tmp[total + cPosition-xLength+1] = {dead: !tmp[total + cPosition-xLength+1].dead, old: false};
+                    tmp[cPosition+xLength+1] = {dead: !tmp[cPosition+xLength+1].dead, old: false};
+                }
+                
+                tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
+                tmp[cPosition+xLength-1] = {dead: !tmp[cPosition+xLength-1].dead, old: false};
+                tmp[cPosition+xLength] = {dead: !tmp[cPosition+xLength].dead, old: false};
+                // tmp[cPosition+xLength+1] = {dead: !tmp[cPosition+xLength+1].dead, old: false};
+                } else if(cPosition > this.state.x*this.state.y - this.state.x-1){
+                        // Find the bottom edges
+                    if(cPosition === total-xLength){
+                        tmp[xLength - 1] = {dead: !tmp[xLength - 1].dead, old: false};
+                        tmp[total-1] = {dead: !tmp[total-1].dead, old: false};
+                        tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
+                        tmp[xLength - (total-cPosition) + 1] = {dead: !tmp[xLength - (total-cPosition) + 1].dead, old: false};
+                    } else if(cPosition === total-1){
+                        tmp[0] = {dead: !tmp[0].dead, old: false};
+                        tmp[total-xLength-2] = {dead: !tmp[total-xLength-2].dead, old: false};
+                        tmp[total-xLength*2] = {dead: !tmp[total-xLength*2].dead, old: false};
+                        tmp[xLength - 2] = {dead: !tmp[xLength - 2].dead, old: false};
+                    } else {
+                        tmp[xLength - (total-cPosition) - 1] = {dead: !tmp[xLength - (total-cPosition) - 1].dead, old: false};
+                        tmp[cPosition-xLength-1] = {dead: !tmp[cPosition-xLength-1].dead, old: false};
+                        tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
+                        tmp[xLength - (total-cPosition) + 1] = {dead: !tmp[xLength - (total-cPosition) + 1].dead, old: false};
+                    }
+                    // tmp[cPosition-xLength-1] = {dead: !tmp[cPosition-xLength-1].dead, old: false};
+                    tmp[cPosition-xLength] = {dead: !tmp[cPosition-xLength].dead, old: false};
+                    tmp[cPosition-xLength+1] = {dead: !tmp[cPosition-xLength+1].dead, old: false};
+                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
+                   
+                    tmp[xLength - (total-cPosition)] = {dead: !tmp[xLength - (total-cPosition)].dead, old: false};
+                    // tmp[xLength - (total-cPosition) + 1] = {dead: !tmp[xLength - (total-cPosition) + 1].dead, old: false};
+                } else if(cPosition % this.state.x === this.state.x-1){
+                    // Find right edge
+                    tmp[cPosition-xLength-1] = {dead: !tmp[cPosition-xLength-1].dead, old: false};
+                    tmp[cPosition-xLength] = {dead: !tmp[cPosition-xLength].dead, old: false};
+                    tmp[(cPosition-xLength+1)-xLength] = {dead: !tmp[(cPosition+xLength+1)-xLength].dead, old: false};
+                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
+                    tmp[cPosition-xLength+1] = {dead: !tmp[cPosition-xLength+1].dead, old: false};
+                    tmp[cPosition+xLength-1] = {dead: !tmp[cPosition+xLength-1].dead, old: false};
+                    tmp[cPosition+xLength] = {dead: !tmp[cPosition+xLength].dead, old: false};
+                    tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
+                } else if(cPosition % xLength === 0){
+                    // Find the left edge
+                    tmp[(cPosition+xLength-1)-xLength] = {dead: !tmp[(cPosition+xLength-1)-xLength].dead, old: false};
+                    tmp[cPosition-xLength] = {dead: !tmp[cPosition-this.state.x].dead, old: false};
+                    tmp[cPosition-xLength+1] = {dead: !tmp[cPosition-this.state.x+1].dead, old: false};
+                    tmp[cPosition+xLength-1] = {dead: !tmp[cPosition+this.state.x-1].dead, old: false};
+                    tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
+                    tmp[(cPosition+this.state.x-1)+xLength] = {dead: !tmp[(cPosition+this.state.x-1)+xLength].dead, old: false};
+                    tmp[cPosition+this.state.x] = {dead: !tmp[cPosition+this.state.x].dead, old: false};
+                    tmp[cPosition+this.state.x+1] = {dead: !tmp[cPosition+this.state.x+1].dead, old: false};
+                } else {
+                    // Cell is not on the edges
+                    tmp[cPosition-xLength-1] = {dead: !tmp[cPosition-xLength-1].dead, old: false};
+                    tmp[cPosition-xLength] = {dead: !tmp[cPosition-xLength].dead, old: false};
+                    tmp[cPosition-xLength+1] = {dead: !tmp[cPosition-xLength+1].dead, old: false};
+                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
+                    tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
+                    tmp[cPosition+xLength-1] = {dead: !tmp[cPosition+xLength-1].dead, old: false};
+                    tmp[cPosition+xLength] = {dead: !tmp[cPosition+xLength].dead, old: false};
+                    tmp[cPosition+xLength+1] = {dead: !tmp[cPosition+xLength+1].dead, old: false};
+                }
+
+
+  
+        
+
         this.setState({rCells: tmp});
     }
 
