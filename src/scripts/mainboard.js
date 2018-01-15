@@ -112,19 +112,6 @@ class MainBoard extends React.Component {
         var total = this.state.x*this.state.y, xLength = this.state.x, yLength = this.state.x;
         tmp[cPosition] = {dead: !tmp[cPosition].dead, old: false};
 
-        // if(cPosition === 0 || cPosition === xLength-1 || cPosition === total-xLength || cPosition === total-1){
-        //     // Corners
-        //     if(cPosition === 0){
-        //         console.log("top left");
-
-        //     } else if(cPosition === xLength-1){
-        //         console.log("top right");
-        //     } else if(cPosition === total-xLength){
-        //         console.log("bottom left");
-        //     } else if(cPosition === total-1){
-        //         console.log("bottom right");
-        //     }
-        // } else 
         if(cPosition < this.state.x){
                 // Top edge
                 tmp[total + cPosition-xLength] = {dead: !tmp[total + cPosition-xLength].dead, old: false};
@@ -205,11 +192,6 @@ class MainBoard extends React.Component {
                     tmp[cPosition+xLength] = {dead: !tmp[cPosition+xLength].dead, old: false};
                     tmp[cPosition+xLength+1] = {dead: !tmp[cPosition+xLength+1].dead, old: false};
                 }
-
-
-  
-        
-
         this.setState({rCells: tmp});
     }
 
