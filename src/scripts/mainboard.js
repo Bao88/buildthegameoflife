@@ -108,14 +108,23 @@ class MainBoard extends React.Component {
     change = (event) => {
         // console.log(event.target.id.substring(1));
         var tmp = this.state.rCells;
-        tmp[event.target.id.substring(1)] = {dead: !tmp[event.target.id.substring(1)].dead, old: false};
-        // console.log(tmp[event.target.id.substring(1,4)].dead);
+        var cPosition = parseInt(event.target.id.substring(1));
+        tmp[cPosition] = {dead: !tmp[cPosition].dead, old: false};
+        tmp[cPosition-this.state.x-1] = {dead: !tmp[cPosition-this.state.x-1].dead, old: false};
+        tmp[cPosition-this.state.x] = {dead: !tmp[cPosition-this.state.x].dead, old: false};
+        tmp[cPosition-this.state.x+1] = {dead: !tmp[cPosition-this.state.x+1].dead, old: false};
+        tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
+        tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
+        tmp[cPosition+this.state.x-1] = {dead: !tmp[cPosition+this.state.x-1].dead, old: false};
+        tmp[cPosition+this.state.x] = {dead: !tmp[cPosition+this.state.x].dead, old: false};
+        tmp[cPosition+this.state.x+1] = {dead: !tmp[cPosition+this.state.x+1].dead, old: false};
         this.setState({rCells: tmp});
     }
 
     // Buttons start, stop and clear
     start = (event) => {
         console.log("start");
+        // console.log();
         // var st = setInterval(this.executeGameOfLife, this.state.speed);
         // this.setState({execution: st});
         this.executeGameOfLife();
