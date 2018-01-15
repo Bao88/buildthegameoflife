@@ -3,223 +3,190 @@ import '../css/mainboard.css';
 
 class Cell extends React.Component {
     state = {
-    //     dead: true,
+        //     dead: true,
         old: false
     }
 
     toggleCell = (event) => {
-        this.setState({dead: !this.state.dead});
+        this.setState({ dead: !this.state.dead });
         // this.props.change(event);
     }
-    render(){
+    render() {
         return (
-            <span id={this.props.n} onClick={this.props.onClick} style={{backgroundColor: this.props.status.dead ? "black": (this.props.status.old ? "red" : "lightcoral")}} className="cell"></span>
+            <span id={this.props.n} onClick={this.props.onClick} style={{ backgroundColor: this.props.status.old ? "red" : (this.props.status.alive ? "lightcoral" : "black") }} className="cell"></span>
         );
     }
 }
 
-
-
-
 class MainBoard extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         var cells = [];
-        var arraySize = props.x*props.y;
-        while(arraySize--) cells[arraySize] = {dead:true, old: false};
-        // var tmp = Array.from(new Array(props.x*props.y), function(val, i) { 
-        //     cells[i] = {dead:true, old: false};
-        //     return <Cell n={"c" + i} key={i} status={cells[i]}/> 
-        //     // ref={(input) => { this.textInput = input; }} />
-        // });
+        var arraySize = props.x * props.y;
+        while (arraySize--) cells[arraySize] = { alive: 0, old: 0 };
 
-        // console.log(cells.length);
         this.state = {
-            // board: tmp,
             x: props.x,
             y: props.y,
             rCells: cells,
-            speed: 1000,
-            execution: null
+            rEmpty: cells,
+            speed: 100,
+            execution: null,
+            generation: 0
         };
-        // console.log(tmp.length);
     }
 
-//      Any live cell with fewer than two live neighbours dies, as if caused by underpopulation.
-//      Any live cell with two or three live neighbours lives on to the next generation.
-//      Any live cell with more than three live neighbours dies, as if by overpopulation.
-//      Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
     executeGameOfLife = (event) => {
-        // console.log("Called");
-        var tmp = this.state.rCells;
-        var currentCell = {};
-        var newStatus = {};
-        var neighboors = 0;
-        for(var i = 0; i < tmp.length; i++){
+        var tmp = this.state.rEmpty;
+        var newArray = [];
+        var neighboors, len = this.state.x, total = this.state.x * this.state.y;
+        for (var i = 0; i < tmp.length; i++) {
             neighboors = 0;
-            currentCell = tmp[i];
 
-            // Cell is dead
-            if(currentCell.dead){
-                console.log("Dead");
-
+            if(i < len) {
+                // Top edge
+                neighboors += this.state.rCells[total + i - len].alive;
+                if (i === 0) {
+                    neighboors += this.state.rCells[total - 1].alive;
+                    neighboors += this.state.rCells[i + (len * 2) - 1].alive;
+                    neighboors += this.state.rCells[total + i - len + 1].alive;
+                    neighboors += this.state.rCells[i + len + 1].alive;
+                } else if (i === len - 1) {
+                    neighboors += this.state.rCells[0].alive;
+                    neighboors += this.state.rCells[i - 1].alive;
+                    neighboors += this.state.rCells[total - 2].alive;
+                    neighboors += this.state.rCells[total - len].alive;
+                } else {
+                    neighboors += this.state.rCells[i - 1].alive;
+                    neighboors += this.state.rCells[total + i - len - 1].alive;
+                    neighboors += this.state.rCells[total + i - len + 1].alive;
+                    neighboors += this.state.rCells[i + len + 1].alive;
+                }
+                neighboors += this.state.rCells[i + 1].alive;
+                neighboors += this.state.rCells[i + len - 1].alive;
+                neighboors += this.state.rCells[i + len].alive;
+            } else if (i > len * this.state.y - len - 1) {
+                // Find the bottom edges
+                if (i === total - len) {
+                    neighboors += this.state.rCells[len - 1].alive;
+                    neighboors += this.state.rCells[total - 1].alive;
+                    neighboors += this.state.rCells[i + 1].alive;
+                    neighboors += this.state.rCells[len - (total - i) + 1].alive;
+                } else if (i === total - 1) {
+                    neighboors += this.state.rCells[0].alive;
+                    neighboors += this.state.rCells[total - len - 2].alive;
+                    neighboors += this.state.rCells[total - len * 2].alive;
+                    neighboors += this.state.rCells[len - 2].alive;
+                } else {
+                    neighboors += this.state.rCells[len - (total - i) - 1].alive;
+                    neighboors += this.state.rCells[i - len - 1].alive;
+                    neighboors += this.state.rCells[i + 1].alive;
+                    neighboors += this.state.rCells[len - (total - i) + 1].alive;
+                }
+                neighboors += this.state.rCells[i - len].alive;
+                neighboors += this.state.rCells[i - len + 1].alive;
+                neighboors += this.state.rCells[i - 1].alive;
+                neighboors += this.state.rCells[len - (total - i)].alive;
+            } else if (i % len === len - 1) {
+                // Find right edge
+                neighboors += this.state.rCells[i - len - 1].alive;
+                neighboors += this.state.rCells[i - len].alive;
+                neighboors += this.state.rCells[(i - len + 1) - len].alive;
+                neighboors += this.state.rCells[i - 1].alive;
+                neighboors += this.state.rCells[i - len + 1].alive;
+                neighboors += this.state.rCells[i + len - 1].alive;
+                neighboors += this.state.rCells[i + len].alive;
+                neighboors += this.state.rCells[i + 1].alive;
+            } else if (i % len === 0) {
+                // Find the left edge
+                neighboors += this.state.rCells[(i + len - 1) - len].alive;
+                neighboors += this.state.rCells[i - len].alive;
+                neighboors += this.state.rCells[i - len + 1].alive;
+                neighboors += this.state.rCells[i + len - 1].alive;
+                neighboors += this.state.rCells[i + 1].alive;
+                neighboors += this.state.rCells[(i + len - 1) + len].alive;
+                neighboors += this.state.rCells[i + len].alive;
+                neighboors += this.state.rCells[i + len + 1].alive;
             } else {
-                // cell is alive
-                console.log("Alive");
+                // Cell is not on the edges
+                neighboors += this.state.rCells[i - len - 1].alive;
+                neighboors += this.state.rCells[i - len].alive;
+                neighboors += this.state.rCells[i - len + 1].alive;
+                neighboors += this.state.rCells[i - 1].alive;
+                neighboors += this.state.rCells[i + 1].alive;
+                neighboors += this.state.rCells[i + len - 1].alive;
+                neighboors += this.state.rCells[i + len].alive;
+                neighboors += this.state.rCells[i + len + 1].alive;
             }
-            // Find the top edge
-            if(i < this.state.x){
-                // currentCell.dead = false;
-                // tmp[i] = currentCell;
-            }
-
-            // Find the left edge
-            if(i % this.state.x === 0){
-                // currentCell.dead = false;
-                // tmp[i] = currentCell;
-            }
-
-            // Find right edge
-            if(i % this.state.x === this.state.x-1){
-                // currentCell.dead = false;
-                // tmp[i] = currentCell;
-            }
-
-            // Find the bottom edges
-            if(i > this.state.x*this.state.y - this.state.x-1){
-                // currentCell.dead = false;
-                // tmp[i] = currentCell;
+            //      Any live cell with fewer than two live neighbours dies, as if caused by underpopulation.
+            //      Any live cell with two or three live neighbours lives on to the next generation.
+            //      Any live cell with more than three live neighbours dies, as if by overpopulation.
+            //      Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+            
+            // Currently a live cell, could modify the tmp = this.state.rCell of some reason, seems like
+            // there are still bindings thus when we modify tmp rCell seems to store those modifications too. Just a theory
+            if (this.state.rCells[i].alive === 1) {
+                if(neighboors < 2 || 3 < neighboors) newArray[i] = 0;
+                if(neighboors === 2 || neighboors === 3) newArray[i] = 1;
+                if(neighboors > 3) newArray[i] = 0; 
+            } else {
+                if (neighboors === 3) {
+                    newArray[i] = 1;
+                }
             }
         }
-        this.setState({rCells: tmp});
+
+        // Copy the status over
+        for(var a = 0; a < tmp.length; a++){
+            if(newArray[a] === 1){
+                if(tmp[a].alive) tmp[a].old = 1;
+                else tmp[a].alive = 1;
+            } 
+            else tmp[a] = {alive: 0, old: 0};
+        }
+        var gTmp = this.state.generation+1;
+        this.setState({ rCells: tmp, generation: gTmp });
     }
+
+    // randomly places cells
     populateBoard = () => {
         var tmp = this.state.rCells;
-        for(var i = 0; i < tmp.length; i++){
+        for (var i = 0; i < tmp.length; i++) {
             var random = Math.random() >= 0.5;
-            console.log(random);
-            tmp[i] = {dead: random ? true : false, old: false};
+            tmp[i] = { alive: random ? 1 : 0, old: 0 };
         }
-
-        console.log(tmp);
-        this.setState({rCells: tmp});
+        this.setState({ rCells: tmp });
     }
 
+    // User can create or kill a cell
     change = (event) => {
-        // console.log(event.target.id.substring(1));
         var tmp = this.state.rCells;
-        var cPosition = parseInt(event.target.id.substring(1));
-        var total = this.state.x*this.state.y, xLength = this.state.x, yLength = this.state.x;
-        tmp[cPosition] = {dead: !tmp[cPosition].dead, old: false};
-
-        if(cPosition < this.state.x){
-                // Top edge
-                tmp[total + cPosition-xLength] = {dead: !tmp[total + cPosition-xLength].dead, old: false};
-                if(cPosition === 0){
-                    tmp[total-1] = {dead: !tmp[total-1].dead, old: false};
-                    tmp[cPosition+(xLength*2)-1] = {dead: !tmp[cPosition+(xLength*2)-1].dead, old: false};
-                    tmp[total + cPosition-xLength+1] = {dead: !tmp[total + cPosition-xLength+1].dead, old: false};
-                    tmp[cPosition+xLength+1] = {dead: !tmp[cPosition+xLength+1].dead, old: false};
-                } else if(cPosition === xLength-1){
-                    tmp[0] = {dead: !tmp[0].dead, old: false};
-                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
-                    tmp[total - 2] = {dead: !tmp[total - 2].dead, old: false};
-                    tmp[total - xLength] = {dead: !tmp[total - xLength].dead, old: false};
-                } else {
-                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
-                    tmp[total + cPosition-xLength-1] = {dead: !tmp[total + cPosition-xLength-1].dead, old: false};
-                    tmp[total + cPosition-xLength+1] = {dead: !tmp[total + cPosition-xLength+1].dead, old: false};
-                    tmp[cPosition+xLength+1] = {dead: !tmp[cPosition+xLength+1].dead, old: false};
-                }
-                
-                tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
-                tmp[cPosition+xLength-1] = {dead: !tmp[cPosition+xLength-1].dead, old: false};
-                tmp[cPosition+xLength] = {dead: !tmp[cPosition+xLength].dead, old: false};
-                // tmp[cPosition+xLength+1] = {dead: !tmp[cPosition+xLength+1].dead, old: false};
-                } else if(cPosition > this.state.x*this.state.y - this.state.x-1){
-                        // Find the bottom edges
-                    if(cPosition === total-xLength){
-                        tmp[xLength - 1] = {dead: !tmp[xLength - 1].dead, old: false};
-                        tmp[total-1] = {dead: !tmp[total-1].dead, old: false};
-                        tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
-                        tmp[xLength - (total-cPosition) + 1] = {dead: !tmp[xLength - (total-cPosition) + 1].dead, old: false};
-                    } else if(cPosition === total-1){
-                        tmp[0] = {dead: !tmp[0].dead, old: false};
-                        tmp[total-xLength-2] = {dead: !tmp[total-xLength-2].dead, old: false};
-                        tmp[total-xLength*2] = {dead: !tmp[total-xLength*2].dead, old: false};
-                        tmp[xLength - 2] = {dead: !tmp[xLength - 2].dead, old: false};
-                    } else {
-                        tmp[xLength - (total-cPosition) - 1] = {dead: !tmp[xLength - (total-cPosition) - 1].dead, old: false};
-                        tmp[cPosition-xLength-1] = {dead: !tmp[cPosition-xLength-1].dead, old: false};
-                        tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
-                        tmp[xLength - (total-cPosition) + 1] = {dead: !tmp[xLength - (total-cPosition) + 1].dead, old: false};
-                    }
-                    // tmp[cPosition-xLength-1] = {dead: !tmp[cPosition-xLength-1].dead, old: false};
-                    tmp[cPosition-xLength] = {dead: !tmp[cPosition-xLength].dead, old: false};
-                    tmp[cPosition-xLength+1] = {dead: !tmp[cPosition-xLength+1].dead, old: false};
-                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
-                   
-                    tmp[xLength - (total-cPosition)] = {dead: !tmp[xLength - (total-cPosition)].dead, old: false};
-                    // tmp[xLength - (total-cPosition) + 1] = {dead: !tmp[xLength - (total-cPosition) + 1].dead, old: false};
-                } else if(cPosition % this.state.x === this.state.x-1){
-                    // Find right edge
-                    tmp[cPosition-xLength-1] = {dead: !tmp[cPosition-xLength-1].dead, old: false};
-                    tmp[cPosition-xLength] = {dead: !tmp[cPosition-xLength].dead, old: false};
-                    tmp[(cPosition-xLength+1)-xLength] = {dead: !tmp[(cPosition+xLength+1)-xLength].dead, old: false};
-                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
-                    tmp[cPosition-xLength+1] = {dead: !tmp[cPosition-xLength+1].dead, old: false};
-                    tmp[cPosition+xLength-1] = {dead: !tmp[cPosition+xLength-1].dead, old: false};
-                    tmp[cPosition+xLength] = {dead: !tmp[cPosition+xLength].dead, old: false};
-                    tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
-                } else if(cPosition % xLength === 0){
-                    // Find the left edge
-                    tmp[(cPosition+xLength-1)-xLength] = {dead: !tmp[(cPosition+xLength-1)-xLength].dead, old: false};
-                    tmp[cPosition-xLength] = {dead: !tmp[cPosition-this.state.x].dead, old: false};
-                    tmp[cPosition-xLength+1] = {dead: !tmp[cPosition-this.state.x+1].dead, old: false};
-                    tmp[cPosition+xLength-1] = {dead: !tmp[cPosition+this.state.x-1].dead, old: false};
-                    tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
-                    tmp[(cPosition+this.state.x-1)+xLength] = {dead: !tmp[(cPosition+this.state.x-1)+xLength].dead, old: false};
-                    tmp[cPosition+this.state.x] = {dead: !tmp[cPosition+this.state.x].dead, old: false};
-                    tmp[cPosition+this.state.x+1] = {dead: !tmp[cPosition+this.state.x+1].dead, old: false};
-                } else {
-                    // Cell is not on the edges
-                    tmp[cPosition-xLength-1] = {dead: !tmp[cPosition-xLength-1].dead, old: false};
-                    tmp[cPosition-xLength] = {dead: !tmp[cPosition-xLength].dead, old: false};
-                    tmp[cPosition-xLength+1] = {dead: !tmp[cPosition-xLength+1].dead, old: false};
-                    tmp[cPosition-1] = {dead: !tmp[cPosition-1].dead, old: false};
-                    tmp[cPosition+1] = {dead: !tmp[cPosition+1].dead, old: false};
-                    tmp[cPosition+xLength-1] = {dead: !tmp[cPosition+xLength-1].dead, old: false};
-                    tmp[cPosition+xLength] = {dead: !tmp[cPosition+xLength].dead, old: false};
-                    tmp[cPosition+xLength+1] = {dead: !tmp[cPosition+xLength+1].dead, old: false};
-                }
-        this.setState({rCells: tmp});
+        var i = parseInt(event.target.id.substring(1), 10);
+        tmp[i] = { alive: (1 === tmp[i].alive) ? 0 : 1, old: 0 };
+        this.setState({ rCells: tmp });
     }
 
     // Buttons start, stop and clear
     start = (event) => {
-        console.log("start");
-        // console.log();
-        // var st = setInterval(this.executeGameOfLife, this.state.speed);
-        // this.setState({execution: st});
-        this.executeGameOfLife();
+        var st = setInterval(this.executeGameOfLife, this.state.speed);
+        this.setState({execution: st});
+        // this.executeGameOfLife();
     }
 
     stop = (event) => {
-        console.log("stop");
         clearInterval(this.state.execution);
     }
 
     clear = (event) => {
-        console.log("clear");
-        var size = this.props.x*this.props.y;
+        var size = this.props.x * this.props.y;
         var tmp = this.state.rCells;
-        while(size--) tmp[size] = {dead:true, old: false};
-        this.setState({rCells: tmp});
+        while (size--) tmp[size] = { alive: 0, old: 0 };
+        this.setState({ rCells: this.state.rEmpty , generation: 0});
     }
- render(){
-        // console.log(this.state.board);
+    render() {
         return (
             <div id="main">
+                <div className="gen">Gene{"   "+this.state.generation+"   "}ration</div>
                 <div className="buttons">
                     <button onClick={this.start}>Start</button>
                     <button onClick={this.stop}>Stop</button>
@@ -228,10 +195,8 @@ class MainBoard extends React.Component {
                 </div>
                 <div className="board">
                     {
-                        // this.state.board
                         this.state.rCells.map((x, i) => (
-                            <Cell n={"c" + i} key={i} status={x} onClick={this.change}/>
-                            // <Cell n={"c" + i} key={i} change={this.change} />
+                            <Cell n={"c" + i} key={i} status={x} onClick={this.change} />
                         ), this)
                     }
                 </div>
