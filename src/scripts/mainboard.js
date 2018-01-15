@@ -32,7 +32,8 @@ class MainBoard extends React.Component {
             rEmpty: cells,
             speed: 100,
             execution: null,
-            generation: 0
+            generation: 0,
+            exeArray: []
         };
     }
 
@@ -168,13 +169,16 @@ class MainBoard extends React.Component {
 
     // Buttons start, stop and clear
     start = (event) => {
+        var array = this.state.exeArray;
         var st = setInterval(this.executeGameOfLife, this.state.speed);
-        this.setState({ execution: st });
+        array.push(st);
+        this.setState({ exeArray: array });
         // this.executeGameOfLife();
     }
 
     stop = (event) => {
-        clearInterval(this.state.execution);
+        var array = this.state.exeArray;
+        clearInterval(array.pop());
     }
 
     clear = (event) => {
